@@ -355,7 +355,7 @@ public:
             }
         }
 
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRetirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRetirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tRafraîchir", EQUIPMENT_SLOT_END, slot);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tRetour", EQUIPMENT_SLOT_END + 1, 0);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
