@@ -11,5 +11,5 @@ void AddSC_transmog_commandscript();
 void Addmod_transmogScripts()
 {
     AddSC_Transmog();
-    AddSC_transmog_commandscript();
+    //AddSC_transmog_commandscript();
 }
