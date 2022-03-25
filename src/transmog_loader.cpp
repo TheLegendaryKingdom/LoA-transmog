@@ -7,6 +7,7 @@
 void AddSC_Transmog();
 //void AddSC_transmog_commandscript();
 void AddSC_Transmog_Item();
+void AddSC_Transmog_Player();
 
 // Add all
 void Addmod_transmogScripts()
@@ -14,4 +15,5 @@ void Addmod_transmogScripts()
     AddSC_Transmog();
     //AddSC_transmog_commandscript();
     AddSC_Transmog_Item();
+    AddSC_Transmog_Player();
 }

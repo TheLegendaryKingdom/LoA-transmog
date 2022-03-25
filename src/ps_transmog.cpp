@@ -3,10 +3,10 @@
 Transmogrification 3.3.5a - Gossip menu
 By Rochet2
 
-ScriptName for item:
-tlk_item_transmog
+ScriptName for player:
+tlk_player_transmog
 
-Adapted from CreatureScript to ItemScript
+Adapted from ItemScript to PlayerScript
 by Ayahuasca-Ruderalis for TheLegendaryKingdom
 */
 #include "Define.h"
@@ -22,21 +22,20 @@ by Ayahuasca-Ruderalis for TheLegendaryKingdom
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
 
-class item_transmog : public ItemScript
+class player_transmog : public PlayerScript
 {
 public:
-    item_transmog() : ItemScript("tlk_item_transmog") { }
+    player_transmog() : PlayerScript("tlk_player_transmog") { }
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
+    void OnSpellCast(Player* player, Spell* spell, bool /*skipCheck*/) override
     {
-        if (player->IsInCombat())
-            return true;
+        if (spell->GetSpellInfo()->Id == 81102)
+            ShowGossipHello(player);
         
-        ShowGossipHello(player, item);
-        return true;
+        return;
     }
 
-    void ShowGossipHello(Player* player, Item* item)
+    void ShowGossipHello(Player* player)
     {
         CloseGossipMenuFor(player);
         ClearGossipMenuFor(player);
@@ -61,21 +60,21 @@ public:
 #endif
         AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:0:0|t Retirer toutes les transmogrifications", EQUIPMENT_SLOT_END + 2, 0, "Voulez-vous vraiment retirer les transmogrifications de TOUS les objets équipés ?", 0, false);
         AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", EQUIPMENT_SLOT_END + 1, 0);
-        SendGossipMenuFor(player, 60004, item->GetGUID());
+        SendGossipMenuFor(player, 60004, player->GetGUID());
         return;
     }
 
-    void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action) override
+    void OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 sender, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         WorldSession* session = player->GetSession();
         switch (sender)
         {
             case EQUIPMENT_SLOT_END: // Show items you can use
-                ShowTransmogItems(player, item, action);
+                ShowTransmogItems(player, action);
                 break;
             case EQUIPMENT_SLOT_END + 1: // Main menu
-                ShowGossipHello(player, item);
+                ShowGossipHello(player);
                 break;
             case EQUIPMENT_SLOT_END + 2: // Remove Transmogrifications
             {
@@ -98,7 +97,7 @@ public:
                 }
                 else
                     session->SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
-                ShowGossipHello(player, item);
+                ShowGossipHello(player);
             } break;
             case EQUIPMENT_SLOT_END + 3: // Remove Transmogrification from single item
             {
@@ -112,14 +111,14 @@ public:
                     else
                         session->SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
                 }
-                OnGossipSelect(player, item, EQUIPMENT_SLOT_END, action);
+                OnGossipSelect(player, 0, EQUIPMENT_SLOT_END, action);
             } break;
     #ifdef PRESETS
             case EQUIPMENT_SLOT_END + 4: // Presets menu
             {
                 if (!sT->GetEnableSets())
                 {
-                    ShowGossipHello(player, item);
+                    ShowGossipHello(player);
                     return;
                 }
                 if (sT->GetEnableSetInfo())
@@ -130,13 +129,13 @@ public:
                 if (sT->presetByName[player->GetGUID()].size() < sT->GetMaxSets())
                     AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20:0:0|t Enregistrer un ensemble", EQUIPMENT_SLOT_END + 8, 0);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 1, 0);
-                SendGossipMenuFor(player, 60004, item->GetGUID());
+                SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 5: // Use preset
             {
                 if (!sT->GetEnableSets())
                 {
-                    ShowGossipHello(player, item);
+                    ShowGossipHello(player);
                     return;
                 }
                 // action = presetID
@@ -145,13 +144,13 @@ public:
                     if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, it->first))
                         sT->PresetTransmog(player, item, it->second, it->first);
                 }
-                OnGossipSelect(player, item, EQUIPMENT_SLOT_END + 6, action);
+                OnGossipSelect(player, 0, EQUIPMENT_SLOT_END + 6, action);
             } break;
             case EQUIPMENT_SLOT_END + 6: // view preset
             {
                 if (!sT->GetEnableSets())
                 {
-                    ShowGossipHello(player, item);
+                    ShowGossipHello(player);
                     return;
                 }
                 // action = presetID
@@ -161,13 +160,13 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Misc_Statue_02:20:20:0:0|t Utiliser cet ensemble", EQUIPMENT_SLOT_END + 5, action, "Transmogrifier cet ensemble va lier à vous TOUS les objets impliqués et les rendre non-remboursables et non-échangeables.\nVoulez-vous continuer ?\n\n" + sT->presetByName[player->GetGUID()][action], 0, false);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:20:20:0:0|t Supprimer cet ensemble", EQUIPMENT_SLOT_END + 7, action, "Voulez-vous vraiment supprimer l'ensemble " + sT->presetByName[player->GetGUID()][action] + " ?", 0, false);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 4, 0);
-                SendGossipMenuFor(player, 60004, item->GetGUID());
+                SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 7: // Delete preset
             {
                 if (!sT->GetEnableSets())
                 {
-                    ShowGossipHello(player, item);
+                    ShowGossipHello(player);
                     return;
                 }
                 // action = presetID
@@ -176,13 +175,13 @@ public:
                 sT->presetById[player->GetGUID()].erase(action);
                 sT->presetByName[player->GetGUID()].erase(action);
 
-                OnGossipSelect(player, item, EQUIPMENT_SLOT_END + 4, 0);
+                OnGossipSelect(player, 0, EQUIPMENT_SLOT_END + 4, 0);
             } break;
             case EQUIPMENT_SLOT_END + 8: // Save preset
             {
                 if (!sT->GetEnableSets() || sT->presetByName[player->GetGUID()].size() >= sT->GetMaxSets())
                 {
-                    ShowGossipHello(player, item);
+                    ShowGossipHello(player);
                     return;
                 }
                 uint32 cost = 0;
@@ -210,24 +209,24 @@ public:
                     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20:0:0|t Enregistrer l'ensemble", 0, 0, "Pour enregistrer cet ensemble, vous devrez lui attribuer un code identifiant (nom) dans la prochaine boîte de dialogue.\n\nVoulez-vous continuer ?", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", sender, action);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 4, 0);
-                SendGossipMenuFor(player, 60004, item->GetGUID());
+                SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 10: // Set info
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 4, 0);
-                SendGossipMenuFor(player, sT->GetSetNpcText(), item->GetGUID());
+                SendGossipMenuFor(player, sT->GetSetNpcText(), player->GetGUID());
             } break;
     #endif
             case EQUIPMENT_SLOT_END + 9: // Transmog info
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 1, 0);
-                SendGossipMenuFor(player, sT->GetTransmogNpcText(), item->GetGUID());
+                SendGossipMenuFor(player, sT->GetTransmogNpcText(), player->GetGUID());
             } break;
             default: // Transmogrify
             {
                 if (!sender && !action)
                 {
-                    ShowGossipHello(player, item);
+                    ShowGossipHello(player);
                     return;
                 }
                 // sender = slot, action = display
@@ -236,24 +235,24 @@ public:
                     session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                 else
                     session->SendNotification(res);
-                // OnGossipSelect(player, item, EQUIPMENT_SLOT_END, sender);
-                // ShowTransmogItems(player, item, sender);
+                // OnGossipSelect(player, 0, EQUIPMENT_SLOT_END, sender);
+                // ShowTransmogItems(player, sender);
                 //CloseGossipMenuFor(player); // Wait for SetMoney to get fixed, issue #10053
-                ShowGossipHello(player, item);
+                ShowGossipHello(player);
             } break;
         }
         return;
     }
 
 #ifdef PRESETS
-    void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code) override
+    void OnGossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 sender, uint32 action, const char* code) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (sender || action)
             return; // should never happen
         if (!sT->GetEnableSets())
         {
-            ShowGossipHello(player, item);
+            ShowGossipHello(player);
             return;
         }
         std::string name(code);
@@ -309,14 +308,14 @@ public:
                 break;
             }
         }
-        //OnGossipSelect(player, item, EQUIPMENT_SLOT_END+4, 0);
+        //OnGossipSelect(player, 0, EQUIPMENT_SLOT_END+4, 0);
         //CloseGossipMenuFor(player); // Wait for SetMoney to get fixed, issue #10053
-        ShowGossipHello(player, item);
+        ShowGossipHello(player);
         return;
     }
 #endif
 
-    void ShowTransmogItems(Player* player, Item* item, uint8 slot) // Only checks bags while can use an item from anywhere in inventory
+    void ShowTransmogItems(Player* player, uint8 slot) // Only checks bags while can use an item from anywhere in inventory
     {
         WorldSession* session = player->GetSession();
         Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
@@ -371,14 +370,14 @@ public:
         AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:0:0|t Retirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
         AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", EQUIPMENT_SLOT_END, slot);
         AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 1, 0);
-        SendGossipMenuFor(player, 60004, item->GetGUID());
+        SendGossipMenuFor(player, 60004, player->GetGUID());
     }
 };
 
 
 
-void AddSC_Transmog_Item()
+void AddSC_Transmog_Player()
 {
-    new item_transmog();
+    new player_transmog();
 }
 
