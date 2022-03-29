@@ -2,15 +2,20 @@
 5.0
 Transmogrification 3.3.5a - Gossip menu
 By Rochet2
+
 ScriptName for NPC:
 Creature_Transmogrify
+
 TODO:
 Make DB saving even better (Deleting)? What about coding?
+
 Fix the cost formula
 -- Too much data handling, use default costs
+
 Are the qualities right?
 Blizzard might have changed the quality requirements.
 (TC handles it with stat checks)
+
 Cant transmogrify rediculus items // Foereaper: would be fun to stab people with a fish
 -- Cant think of any good way to handle this easily, could rip flagged items from cata DB
 */
@@ -352,10 +357,9 @@ public:
             if (sT->GetUseCollectionSystem())
             {
                 sendGossip = false;
-<<<<<<< HEAD
 
                 std::string query = "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " ORDER BY item_template_id";
-                session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+                session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
                 {
                     uint16 pageNumber = 0;
                     uint32 startValue = 0;
@@ -413,68 +417,6 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, slot);
                     }
 
-=======
-
-                std::string query = "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " ORDER BY item_template_id";
-                session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
-                {
-                    uint16 pageNumber = 0;
-                    uint32 startValue = 0;
-                    uint32 endValue = MAX_OPTIONS - 3;
-                    bool lastPage = false;
-                    if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
-                    {
-                        pageNumber = gossipPageNumber - EQUIPMENT_SLOT_END - 10;
-                        startValue = (pageNumber * (MAX_OPTIONS - 2));
-                        endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
-                    }
-                    if (result)
-                    {
-                        std::vector<Item*> allowedItems;
-                        do {
-                            uint32 newItemEntryId = (*result)[0].Get<uint32>();
-                            Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
-                            if (!newItem)
-                                continue;
-                            if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
-                                continue;
-                            if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
-                                continue;
-                            allowedItems.push_back(newItem);
-                        } while (result->NextRow());
-                        for (uint32 i = startValue; i <= endValue; i++)
-                        {
-                            if (allowedItems.empty() || i > allowedItems.size() - 1)
-                            {
-                                lastPage = true;
-                                break;
-                            }
-                            Item* newItem = allowedItems.at(i);
-                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
-                        }
-                    }
-                    if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, slot);
-                        if (!lastPage)
-                        {
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
-                        }
-                    }
-                    else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, slot);
-                        if (!lastPage)
-                        {
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
-                        }
-                    }
-                    else if (!lastPage)
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, slot);
-                    }
-
->>>>>>> 247e13342d474a50db2693bae23176c9cd9ef50d
                     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
                     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
                     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
@@ -548,13 +490,13 @@ private:
         std::string itemQuality = tempStream.str();
         bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
         std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
-        player->GetSession()->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+        player->GetSession()->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
         {
             if (!result)
             {
                 if (showChatMessage)
-                    ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
-                CharacterDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+                    ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r a été ajouté à votre collection d'apparences.)", itemQuality.c_str(), itemId, itemName.c_str());
+                LoginDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
             }
         }));
     }
