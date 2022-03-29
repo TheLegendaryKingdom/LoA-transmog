@@ -2,20 +2,15 @@
 5.0
 Transmogrification 3.3.5a - Gossip menu
 By Rochet2
-
 ScriptName for NPC:
 Creature_Transmogrify
-
 TODO:
 Make DB saving even better (Deleting)? What about coding?
-
 Fix the cost formula
 -- Too much data handling, use default costs
-
 Are the qualities right?
 Blizzard might have changed the quality requirements.
 (TC handles it with stat checks)
-
 Cant transmogrify rediculus items // Foereaper: would be fun to stab people with a fish
 -- Cant think of any good way to handle this easily, could rip flagged items from cata DB
 */
@@ -51,24 +46,24 @@ public:
     {
         WorldSession* session = player->GetSession();
         if (sT->GetEnableTransmogInfo())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface/ICONS/INV_Misc_Book_11:20:20:0:0|t Informations sur la transmogrification", EQUIPMENT_SLOT_END + 9, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tHow does transmogrification work?", EQUIPMENT_SLOT_END + 9, 0);
         for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
         {
             if (const char* slotName = sT->GetSlotName(slot, session))
             {
                 Item* newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
                 uint32 entry = newItem ? sT->GetFakeEntry(newItem->GetGUID()) : 0;
-                std::string icon = entry ? sT->GetItemIcon(entry, 20, 20, 0, 0) : sT->GetSlotIcon(slot, 20, 20, 0, 0);
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, icon + " " + std::string(slotName), EQUIPMENT_SLOT_END, slot);
+                std::string icon = entry ? sT->GetItemIcon(entry, 30, 30, -18, 0) : sT->GetSlotIcon(slot, 30, 30, -18, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, icon + std::string(slotName), EQUIPMENT_SLOT_END, slot);
             }
         }
 #ifdef PRESETS
         if (sT->GetEnableSets())
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:20:20:0:0|t Gérer les ensembles", EQUIPMENT_SLOT_END + 4, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:30:30:-18:0|tManage sets", EQUIPMENT_SLOT_END + 4, 0);
 #endif
-        AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:0:0|t Retirer toutes les transmogrifications", EQUIPMENT_SLOT_END + 2, 0, "Voulez-vous vraiment retirer les transmogrifications de TOUS les objets équipés ?", 0, false);
-        AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", EQUIPMENT_SLOT_END + 1, 0);
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove all transmogrifications", EQUIPMENT_SLOT_END + 2, 0, "Remove transmogrifications from all equipped items?", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END + 1, 0);
+        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
     }
 
@@ -76,10 +71,16 @@ public:
     {
         player->PlayerTalkClass->ClearMenus();
         WorldSession* session = player->GetSession();
+        // Next page
+        if (sender > EQUIPMENT_SLOT_END + 10)
+        {
+            ShowTransmogItems(player, creature, action, sender);
+            return true;
+        }
         switch (sender)
         {
             case EQUIPMENT_SLOT_END: // Show items you can use
-                ShowTransmogItems(player, creature, action);
+                ShowTransmogItems(player, creature, action, sender);
                 break;
             case EQUIPMENT_SLOT_END + 1: // Main menu
                 OnGossipHello(player, creature);
@@ -130,14 +131,14 @@ public:
                     return true;
                 }
                 if (sT->GetEnableSetInfo())
-                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface/ICONS/INV_Misc_Book_11:20:20:0:0|t Informations sur les ensembles", EQUIPMENT_SLOT_END + 10, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tHow do sets work?", EQUIPMENT_SLOT_END + 10, 0);
                 for (Transmogrification::presetIdMap::const_iterator it = sT->presetByName[player->GetGUID()].begin(); it != sT->presetByName[player->GetGUID()].end(); ++it)
-                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface/ICONS/INV_Misc_Statue_02:20:20:0:0|t " + it->second, EQUIPMENT_SLOT_END + 6, it->first);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t" + it->second, EQUIPMENT_SLOT_END + 6, it->first);
 
                 if (sT->presetByName[player->GetGUID()].size() < sT->GetMaxSets())
-                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20:0:0|t Enregistrer un ensemble", EQUIPMENT_SLOT_END + 8, 0);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 1, 0);
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|tSave set", EQUIPMENT_SLOT_END + 8, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 5: // Use preset
             {
@@ -163,12 +164,12 @@ public:
                 }
                 // action = presetID
                 for (Transmogrification::slotMap::const_iterator it = sT->presetById[player->GetGUID()][action].begin(); it != sT->presetById[player->GetGUID()][action].end(); ++it)
-                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, sT->GetItemIcon(it->second, 20, 20, 0, 0) + sT->GetItemLink(it->second, session), sender, action);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(it->second, 30, 30, -18, 0) + sT->GetItemLink(it->second, session), sender, action);
 
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Misc_Statue_02:20:20:0:0|t Utiliser cet ensemble", EQUIPMENT_SLOT_END + 5, action, "Transmogrifier cet ensemble va lier à vous TOUS les objets impliqués et les rendre non-remboursables et non-échangeables.\nVoulez-vous continuer ?\n\n" + sT->presetByName[player->GetGUID()][action], 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:20:20:0:0|t Supprimer cet ensemble", EQUIPMENT_SLOT_END + 7, action, "Voulez-vous vraiment supprimer l'ensemble " + sT->presetByName[player->GetGUID()][action] + " ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 4, 0);
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|tUse this set", EQUIPMENT_SLOT_END + 5, action, "Using this set for transmogrify will bind transmogrified items to you and make them non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->presetByName[player->GetGUID()][action], 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:30:30:-18:0|tDelete set", EQUIPMENT_SLOT_END + 7, action, "Are you sure you want to delete " + sT->presetByName[player->GetGUID()][action] + "?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 4, 0);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 7: // Delete preset
             {
@@ -210,24 +211,24 @@ public:
                             continue;
                         cost += sT->GetSpecialPrice(temp);
                         canSave = true;
-                        AddGossipItemFor(player, GOSSIP_ICON_VENDOR, sT->GetItemIcon(entry, 20, 20, 0, 0) + sT->GetItemLink(entry, session), EQUIPMENT_SLOT_END + 8, 0);
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(entry, 30, 30, -18, 0) + sT->GetItemLink(entry, session), EQUIPMENT_SLOT_END + 8, 0);
                     }
                 }
                 if (canSave)
-                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20:0:0|t Enregistrer l'ensemble", 0, 0, "Pour enregistrer cet ensemble, vous devrez lui attribuer un code identifiant (nom) dans la prochaine boîte de dialogue.\n\nVoulez-vous continuer ?", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", sender, action);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 4, 0);
-                SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|tSave set", 0, 0, "Insert set name", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", sender, action);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 4, 0);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 10: // Set info
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 4, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, sT->GetSetNpcText(), creature->GetGUID());
             } break;
     #endif
             case EQUIPMENT_SLOT_END + 9: // Transmog info
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 1, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, sT->GetTransmogNpcText(), creature->GetGUID());
             } break;
             default: // Transmogrify
@@ -238,11 +239,22 @@ public:
                     return true;
                 }
                 // sender = slot, action = display
-                TransmogAcoreStrings res = sT->Transmogrify(player, ObjectGuid::Create<HighGuid::Item>(action), sender);
-                if (res == LANG_ERR_TRANSMOG_OK)
-                    session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
+                if (sT->GetUseCollectionSystem())
+                {
+                    TransmogAcoreStrings res = sT->Transmogrify(player, action, sender);
+                    if (res == LANG_ERR_TRANSMOG_OK)
+                        session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
+                    else
+                        session->SendNotification(res);
+                }
                 else
-                    session->SendNotification(res);
+                {
+                    TransmogAcoreStrings res = sT->Transmogrify(player, ObjectGuid::Create<HighGuid::Item>(action), sender);
+                    if (res == LANG_ERR_TRANSMOG_OK)
+                        session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
+                    else
+                        session->SendNotification(res);
+                }
                 // OnGossipSelect(player, creature, EQUIPMENT_SLOT_END, sender);
                 // ShowTransmogItems(player, creature, sender);
                 CloseGossipMenuFor(player); // Wait for SetMoney to get fixed, issue #10053
@@ -321,13 +333,13 @@ public:
     }
 #endif
 
-    void ShowTransmogItems(Player* player, Creature* creature, uint8 slot) // Only checks bags while can use an item from anywhere in inventory
+    void ShowTransmogItems(Player* player, Creature* creature, uint8 slot, uint16 gossipPageNumber) // Only checks bags while can use an item from anywhere in inventory
     {
         WorldSession* session = player->GetSession();
         Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        bool sendGossip = true;
         if (oldItem)
         {
-            uint32 limit = 0;
             uint32 price = sT->GetSpecialPrice(oldItem->GetTemplate());
             price *= sT->GetScaledCostModifier();
             price += sT->GetCopperCost();
@@ -335,32 +347,85 @@ public:
             ss << std::endl;
             if (sT->GetRequireToken())
                 ss << std::endl << std::endl << sT->GetTokenAmount() << " x " << sT->GetItemLink(sT->GetTokenEntry(), session);
+            std::string lineEnd = ss.str();
 
-            for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+            if (sT->GetUseCollectionSystem())
             {
-                if (limit > MAX_OPTIONS)
-                    break;
-                Item* newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-                if (!newItem)
-                    continue;
-                if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
-                    continue;
-                if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
-                    continue;
-                ++limit;
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, sT->GetItemIcon(newItem->GetEntry(), 20, 20, 0, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), "Le processus de transmogrification va lier cet objet à vous, le rendant non-échangeable et non-remboursable.\n\nVoulez-vous continuer ?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
+                sendGossip = false;
+
+                std::string query = "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " ORDER BY item_template_id";
+                session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+                {
+                    uint16 pageNumber = 0;
+                    uint32 startValue = 0;
+                    uint32 endValue = MAX_OPTIONS - 3;
+                    bool lastPage = false;
+                    if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
+                    {
+                        pageNumber = gossipPageNumber - EQUIPMENT_SLOT_END - 10;
+                        startValue = (pageNumber * (MAX_OPTIONS - 2));
+                        endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
+                    }
+                    if (result)
+                    {
+                        std::vector<Item*> allowedItems;
+                        do {
+                            uint32 newItemEntryId = (*result)[0].Get<uint32>();
+                            Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
+                            if (!newItem)
+                                continue;
+                            if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
+                                continue;
+                            if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
+                                continue;
+                            allowedItems.push_back(newItem);
+                        } while (result->NextRow());
+                        for (uint32 i = startValue; i <= endValue; i++)
+                        {
+                            if (allowedItems.empty() || i > allowedItems.size() - 1)
+                            {
+                                lastPage = true;
+                                break;
+                            }
+                            Item* newItem = allowedItems.at(i);
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
+                        }
+                    }
+                    if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, slot);
+                        if (!lastPage)
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
+                        }
+                    }
+                    else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, slot);
+                        if (!lastPage)
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
+                        }
+                    }
+                    else if (!lastPage)
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, slot);
+                    }
+
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+                    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                }));
             }
-
-            for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+            else
             {
-                Bag* bag = player->GetBagByPos(i);
-                if (!bag)
-                    continue;
-                for (uint32 j = 0; j < bag->GetBagSize(); ++j)
+                uint32 limit = 0;
+                for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
                 {
                     if (limit > MAX_OPTIONS)
                         break;
-                    Item* newItem = player->GetItemByPos(i, j);
+                    Item* newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
                     if (!newItem)
                         continue;
                     if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
@@ -368,24 +433,132 @@ public:
                     if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
                         continue;
                     ++limit;
-                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, sT->GetItemIcon(newItem->GetEntry(), 20, 20, 0, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), "Le processus de transmogrification va lier cet objet à vous, le rendant non-échangeable et non-remboursable.\n\nVoulez-vous continuer ?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
+                }
+
+                for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+                {
+                    Bag* bag = player->GetBagByPos(i);
+                    if (!bag)
+                        continue;
+                    for (uint32 j = 0; j < bag->GetBagSize(); ++j)
+                    {
+                        if (limit > MAX_OPTIONS)
+                            break;
+                        Item* newItem = player->GetItemByPos(i, j);
+                        if (!newItem)
+                            continue;
+                        if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
+                            continue;
+                        if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
+                            continue;
+                        ++limit;
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
+                    }
                 }
             }
         }
 
-        AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:0:0|t Retirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
-        AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", EQUIPMENT_SLOT_END, slot);
-        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20:0:0|t Retour", EQUIPMENT_SLOT_END + 1, 0);
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        if (sendGossip) {
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+        }
     }
 };
 
 class PS_Transmogrification : public PlayerScript
 {
+private:
+    void AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
+    {
+        if (!sT->GetTrackUnusableItems() && !sT->SuitableForTransmogrification(player, itemTemplate))
+            return;
+        if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
+            return;
+        uint32 itemId = itemTemplate->ItemId;
+        uint32 accountId = player->GetSession()->GetAccountId();
+        std::string itemName = itemTemplate -> Name1;
+        std::stringstream tempStream;
+        tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
+        std::string itemQuality = tempStream.str();
+        bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
+        std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
+        player->GetSession()->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+        {
+            if (!result)
+            {
+                if (showChatMessage)
+                    ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
+                CharacterDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+            }
+        }));
+    }
 public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify") { }
 
-    void OnAfterSetVisibleItemSlot(Player* player, uint8 slot, Item *item)
+    void OnEquip(Player* player, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        ItemTemplate const* pProto = it->GetTemplate();
+        AddToDatabase(player, pProto);
+    }
+
+    void OnLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        {
+            AddToDatabase(player, item->GetTemplate());
+        }
+    }
+
+    void OnCreateItem(Player* player, Item* item, uint32 /*count*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        {
+            AddToDatabase(player, item->GetTemplate());
+        }
+    }
+
+    void OnAfterStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, Item* item, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        {
+            AddToDatabase(player, item->GetTemplate());
+        }
+    }
+
+    void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+        {
+            uint32 itemId = uint32(quest->RewardChoiceItemId[i]);
+            if (!itemId)
+                continue;
+            ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
+            AddToDatabase(player, itemTemplate);
+        }
+        for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+        {
+            uint32 itemId = uint32(quest->RewardItemId[i]);
+            if (!itemId)
+                continue;
+            ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
+            AddToDatabase(player, itemTemplate);
+        }
+    }
+
+    void OnAfterSetVisibleItemSlot(Player* player, uint8 slot, Item *item) override
     {
         if (!item)
             return;
@@ -396,12 +569,12 @@ public:
         }
     }
 
-    void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/)
+    void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
     {
         sT->DeleteFakeFromDB(it->GetGUID().GetCounter());
     }
 
-    void OnLogin(Player* player)
+    void OnLogin(Player* player) override
     {
         ObjectGuid playerGUID = player->GetGUID();
         sT->entryMap.erase(playerGUID);
@@ -437,7 +610,7 @@ public:
 #endif
     }
 
-    void OnLogout(Player* player)
+    void OnLogout(Player* player) override
     {
         ObjectGuid pGUID = player->GetGUID();
         for (Transmogrification::transmog2Data::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
@@ -480,12 +653,12 @@ class global_transmog_script : public GlobalScript
 public:
     global_transmog_script() : GlobalScript("global_transmog_script") { }
 
-    void OnItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
+    void OnItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid) override
     {
         sT->DeleteFakeFromDB(itemGuid, &trans);
     }
 
-    void OnMirrorImageDisplayItem(const Item *item, uint32 &display)
+    void OnMirrorImageDisplayItem(const Item *item, uint32 &display) override
     {
         if (uint32 entry = sTransmogrification->GetFakeEntry(item->GetGUID()))
             display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
@@ -523,4 +696,3 @@ void AddSC_Transmog()
     new PS_Transmogrification();
     new WS_Transmogrification();
 }
-
