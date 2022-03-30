@@ -251,7 +251,7 @@ public:
                     else
                         session->SendNotification(res);
                 }
-                ShowGossipHello(player);
+                OnGossipSelect(player, 0, EQUIPMENT_SLOT_END, sender);
             } break;
         }
         return;
