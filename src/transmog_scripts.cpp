@@ -489,14 +489,13 @@ private:
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
         bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
-        std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
+        std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE (account_id = 0 or account_id = " + std::to_string(accountId) + ") AND item_template_id = " + std::to_string(itemId);
         player->GetSession()->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
         {
             if (!result)
             {
                 if (showChatMessage)
                     ChatHandler(player->GetSession()).SendSysMessage(sT->GetItemLink(itemId, player->GetSession()) + " a rejoint votre collection d'apparences.");
-                    //ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r a été ajouté à votre collection d'apparences.)", itemQuality.c_str(), itemId, itemName.c_str());
                 LoginDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
             }
         }));

@@ -349,7 +349,7 @@ public:
             {
                 sendGossip = false;
 
-                std::string query = "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " ORDER BY item_template_id";
+                std::string query = "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = 0 OR account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " ORDER BY item_template_id";
                 session->GetQueryProcessor().AddCallback(LoginDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
                 {
                     uint16 pageNumber = 0;
