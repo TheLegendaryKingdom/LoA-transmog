@@ -495,7 +495,8 @@ private:
             if (!result)
             {
                 if (showChatMessage)
-                    ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r a été ajouté à votre collection d'apparences.)", itemQuality.c_str(), itemId, itemName.c_str());
+                    ChatHandler(player->GetSession()).SendSysMessage(sT->GetItemLink(itemId, player->GetSession()) + " a rejoint votre collection d'apparences.");
+                    //ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r a été ajouté à votre collection d'apparences.)", itemQuality.c_str(), itemId, itemName.c_str());
                 LoginDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
             }
         }));
