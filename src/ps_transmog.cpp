@@ -65,6 +65,9 @@ public:
 
     void OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 sender, uint32 action) override
     {
+        if (action >= 1000000)
+            return;
+        
         player->PlayerTalkClass->ClearMenus();
         WorldSession* session = player->GetSession();
         // Next page
