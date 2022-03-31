@@ -218,9 +218,18 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
             }
         }
     }
-
     std::ostringstream oss;
-    oss << "|c" << std::hex << ItemQualityColors[temp->Quality] << std::dec <<
+        
+    if (temp->Quality == 7)
+        oss << "|cff009EDA";
+    else if (temp->Quality == 6)
+        oss << "|cffCD3C70";
+    else if (temp->Quality == 0)
+        oss << "|cff767676";
+    else
+        oss << "|c" << std::hex << ItemQualityColors[temp->Quality];
+
+    oss << std::dec <<
         "|Hitem:" << temp->ItemId << ":" <<
         item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT) << ":" <<
         item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT) << ":" <<
