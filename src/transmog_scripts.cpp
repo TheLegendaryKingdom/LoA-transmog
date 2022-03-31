@@ -482,6 +482,10 @@ private:
             return;
         if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
             return;
+        if (itemTemplate->Class == ITEM_CLASS_ARMOR && (itemTemplate->SubClass < 1 || itemTemplate->SubClass > 4))
+            return;
+        if (!itemTemplate->Quality)
+            return;
         uint32 itemId = itemTemplate->ItemId;
         uint32 accountId = player->GetSession()->GetAccountId();
         std::string itemName = itemTemplate -> Name1;
