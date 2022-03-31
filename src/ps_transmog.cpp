@@ -55,10 +55,10 @@ public:
         }
 #ifdef PRESETS
         if (sT->GetEnableSets())
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Misc_Statue_02:20:20:0:0|t Gérer les ensembles", EQUIPMENT_SLOT_END + 4, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Gérer les ensembles", EQUIPMENT_SLOT_END + 4, 0);
 #endif
-        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:0:0|t Retirer toutes les transmogrifications", EQUIPMENT_SLOT_END + 2, 0, "Voulez-vous vraiment retirer les transmogrifications de TOUS les objets équipés ?", 0, false);
-        AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:0:0|t Rafraîchir", EQUIPMENT_SLOT_END + 1, 0);
+        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Retirer toutes les transmogrifications", EQUIPMENT_SLOT_END + 2, 0, "Voulez-vous vraiment retirer les transmogrifications de TOUS les objets équipés ?", 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_TALK, "Rafraîchir", EQUIPMENT_SLOT_END + 1, 0);
         SendGossipMenuFor(player, 60004, player->GetGUID());
         return true;        
     }
@@ -136,7 +136,7 @@ public:
 
                 if (sT->presetByName[player->GetGUID()].size() < sT->GetMaxSets())
                     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20|t Enregistrer un ensemble", EQUIPMENT_SLOT_END + 8, 0);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 1, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 5: // Use preset
@@ -167,7 +167,7 @@ public:
 
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Misc_Statue_02:20:20|t Utiliser cet ensemble", EQUIPMENT_SLOT_END + 5, action, "Appliquer l'ensemble de transmogrification \"" + sT->presetByName[player->GetGUID()][action] + "\" ?", 0, false);
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:20:20|t Supprimer l'ensemble", EQUIPMENT_SLOT_END + 7, action, "Voulez-vous vraiment supprimer l'ensemble de transmogrification \"" + sT->presetByName[player->GetGUID()][action] + "\" ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 4, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 7: // Delete preset
@@ -215,19 +215,19 @@ public:
                 }
                 if (canSave)
                     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20|t Enregistrer l'ensemble", 0, 0, "Pour enregistrer cet ensemble, vous devrez lui attribuer un code identifiant (nom) dans la prochaine boîte de dialogue.\n\nVoulez-vous continuer ?", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20|t Rafraîchir", sender, action);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 4, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Rafraîchir", sender, action);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 10: // Set info
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 4, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, sT->GetSetNpcText(), player->GetGUID());
             } break;
     #endif
             case EQUIPMENT_SLOT_END + 9: // Transmog info
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 1, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, sT->GetTransmogNpcText(), player->GetGUID());
             } break;
             default: // Transmogrify
@@ -411,9 +411,9 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Page suivante", EQUIPMENT_SLOT_END + 11, slot);
                     }
 
-                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20|t Retirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
-                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20|t Rafraîchir", EQUIPMENT_SLOT_END, slot);
-                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 1, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Retirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "Rafraîchir", EQUIPMENT_SLOT_END, slot);
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 1, 0);
                     SendGossipMenuFor(player, 60004, player->GetGUID());
                 }));
             }
@@ -459,9 +459,9 @@ public:
         }
 
         if (sendGossip) {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "|TInterface/ICONS/INV_Enchant_Disenchant:20:20|t Retirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, " Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
-            AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20|t Rafraîchir", EQUIPMENT_SLOT_END, slot);
-            AddGossipItemFor(player, GOSSIP_ICON_TALK, "|TInterface/ICONS/Ability_Spy:20:20|t Retour", EQUIPMENT_SLOT_END + 1, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Retirer la transmogrification", EQUIPMENT_SLOT_END + 3, slot, " Voulez-vous vraiment retirer cette transmogrification ?", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Rafraîchir", EQUIPMENT_SLOT_END, slot);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 1, 0);
             SendGossipMenuFor(player, 60004, player->GetGUID());
         }
         
