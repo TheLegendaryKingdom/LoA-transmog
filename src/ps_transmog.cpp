@@ -132,10 +132,10 @@ public:
                 if (sT->GetEnableSetInfo())
                     AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface/ICONS/INV_Misc_Book_11:20:20|t Informations sur les ensembles", EQUIPMENT_SLOT_END + 10, 0);
                 for (Transmogrification::presetIdMap::const_iterator it = sT->presetByName[player->GetGUID()].begin(); it != sT->presetByName[player->GetGUID()].end(); ++it)
-                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "|TInterface/ICONS/INV_Misc_Statue_02:20:20|t" + it->second, EQUIPMENT_SLOT_END + 6, it->first);
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, it->second, EQUIPMENT_SLOT_END + 6, it->first);
 
                 if (sT->presetByName[player->GetGUID()].size() < sT->GetMaxSets())
-                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20|t Enregistrer un ensemble", EQUIPMENT_SLOT_END + 8, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Nouvel ensemble", EQUIPMENT_SLOT_END + 8, 0);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
@@ -165,8 +165,8 @@ public:
                 for (Transmogrification::slotMap::const_iterator it = sT->presetById[player->GetGUID()][action].begin(); it != sT->presetById[player->GetGUID()][action].end(); ++it)
                     AddGossipItemFor(player, GOSSIP_ICON_VENDOR, sT->GetItemIcon(it->second, 20, 20, 0, 0) + sT->GetItemLink(it->second, session), sender, action);
 
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/ICONS/INV_Misc_Statue_02:20:20|t Utiliser cet ensemble", EQUIPMENT_SLOT_END + 5, action, "Appliquer l'ensemble de transmogrification \"" + sT->presetByName[player->GetGUID()][action] + "\" ?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:20:20|t Supprimer l'ensemble", EQUIPMENT_SLOT_END + 7, action, "Voulez-vous vraiment supprimer l'ensemble de transmogrification \"" + sT->presetByName[player->GetGUID()][action] + "\" ?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Appliquer l'ensemble", EQUIPMENT_SLOT_END + 5, action, "Appliquer l'ensemble de transmogrification \"" + sT->presetByName[player->GetGUID()][action] + "\" ?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Supprimer l'ensemble", EQUIPMENT_SLOT_END + 7, action, "Voulez-vous vraiment supprimer l'ensemble de transmogrification \"" + sT->presetByName[player->GetGUID()][action] + "\" ?", 0, false);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, 60004, player->GetGUID());
             } break;
@@ -214,7 +214,7 @@ public:
                     }
                 }
                 if (canSave)
-                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20|t Enregistrer l'ensemble", 0, 0, "Pour enregistrer cet ensemble, vous devrez lui attribuer un code identifiant (nom) dans la prochaine boîte de dialogue.\n\nVoulez-vous continuer ?", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
+                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Enregistrer l'ensemble", 0, 0, "Pour enregistrer cet ensemble, vous devrez lui attribuer un code identifiant (nom) dans la prochaine boîte de dialogue.\n\nVoulez-vous continuer ?", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Rafraîchir", sender, action);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Retour", EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, 60004, player->GetGUID());
