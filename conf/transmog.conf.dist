@@ -129,6 +129,10 @@ Transmogrification.TokenAmount = 1
 #        Description: Allow axe to be transmogrified with dagger for example
 #        Default:    0
 #
+#    Transmogrification.AllowMixedWieldingTypes
+#        Description: Allow two-handed wepaons to be transmogrified with one-handed and vice-versa
+#        Default:    0
+#
 #    Transmogrification.AllowFishingPoles
 #        Description: Allow fishing poles to be transmogrified
 #        Default:    0
@@ -172,6 +176,7 @@ Transmogrification.AllowHeirloom = 1
 
 Transmogrification.AllowMixedArmorTypes = 0
 Transmogrification.AllowMixedWeaponTypes = 0
+Transmogrification.AllowMixedWieldingTypes = 0
 Transmogrification.AllowFishingPoles = 0
 
 Transmogrification.IgnoreReqRace = 0

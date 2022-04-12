@@ -482,7 +482,7 @@ private:
             return;
         if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
             return;
-        if (itemTemplate->Class == ITEM_CLASS_ARMOR && (itemTemplate->SubClass < 1 || itemTemplate->SubClass > 4))
+        if (itemTemplate->Class == ITEM_CLASS_ARMOR && (itemTemplate->SubClass > 6 || (itemTemplate->InventoryType == 0 || itemTemplate->InventoryType == 2 || itemTemplate->InventoryType == 11 || itemTemplate->InventoryType == 12 || itemTemplate->InventoryType == 28)))
             return;
         if (!itemTemplate->Quality)
             return;

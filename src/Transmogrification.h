@@ -114,6 +114,7 @@ public:
 
     bool AllowMixedArmorTypes;
     bool AllowMixedWeaponTypes;
+    bool AllowMixedWieldingTypes;
     bool AllowFishingPoles;
 
     bool IgnoreReqRace;
@@ -133,6 +134,8 @@ public:
     bool IsNotAllowed(uint32 entry) const;
     bool IsAllowedQuality(uint32 quality) const;
     bool IsRangedWeapon(uint32 Class, uint32 SubClass) const;
+    bool Is2H(ItemTemplate const* item) const;
+    bool Is1H(ItemTemplate const* item) const;
 
     void LoadConfig(bool reload); // thread unsafe
 
@@ -165,6 +168,7 @@ public:
 
     bool GetAllowMixedArmorTypes() const;
     bool GetAllowMixedWeaponTypes() const;
+    bool GetAllowMixedWieldingTypes() const;
 
     // Config
     bool GetEnableTransmogInfo() const;
