@@ -465,7 +465,10 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
             !((source->InventoryType == INVTYPE_CHEST || source->InventoryType == INVTYPE_ROBE) &&
                 (target->InventoryType == INVTYPE_CHEST || target->InventoryType == INVTYPE_ROBE)))
             return false;
-    }
+    } 
+    
+    if (!(AllowMixedWieldingTypes) && ((Is1H(source) && !(Is1H(target))) || (Is2H(source) && !Is2H(target))))
+        return false;
 
     return true;
 }
@@ -672,6 +675,7 @@ void Transmogrification::LoadConfig(bool reload)
 
     AllowMixedArmorTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedArmorTypes", false);
     AllowMixedWeaponTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedWeaponTypes", false);
+    AllowMixedWieldingTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedWieldingTypes", false);
     AllowFishingPoles = sConfigMgr->GetOption<bool>("Transmogrification.AllowFishingPoles", false);
 
     IgnoreReqRace = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqRace", false);
@@ -752,6 +756,10 @@ bool Transmogrification::GetAllowMixedWeaponTypes() const
 {
     return AllowMixedWeaponTypes;
 };
+bool Transmogrification::GetAllowMixedWieldingTypes() const
+{
+    return AllowMixedWieldingTypes;
+};
 bool Transmogrification::GetUseCollectionSystem() const
 {
     return UseCollectionSystem;
@@ -766,3 +774,19 @@ bool Transmogrification::IsEnabled() const
 {
     return IsTransmogEnabled;
 };
+
+bool Transmogrification::Is2H(ItemTemplate const* item) const
+{
+    if (item->Class == 2 && item->InventoryType == 17)
+        return true;// ^--Weapon                // ^^-Two-handed
+
+    return false;
+}
+
+bool Transmogrification::Is1H(ItemTemplate const* item) const
+{
+    if (item->Class == 2 && (item->InventoryType == 13 || item->InventoryType == 21 || item->InventoryType == 22))
+        return true;// ^--Weapon                 // ^^-One-handed             // ^^-Main-handed            // ^^-Off-handed weapon
+
+    return false;
+}
