@@ -237,7 +237,7 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
         item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3) << ":" <<
         item->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT) << ":" <<
         item->GetItemRandomPropertyId() << ":" << item->GetItemSuffixFactor() << ":" <<
-//        (uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
+      //(uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
         (uint32)0 << "|h[" << name << "]|h|r";
 
     return oss.str();
@@ -254,7 +254,17 @@ std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session)
         ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
 
     std::ostringstream oss;
-    oss << "|c" << std::hex << ItemQualityColors[temp->Quality] << std::dec <<
+        
+    if (temp->Quality == 7)
+        oss << "|cff009EDA";
+    else if (temp->Quality == 6)
+        oss << "|cffCD3C70";
+    else if (temp->Quality == 0)
+        oss << "|cff767676";
+    else
+        oss << "|c" << std::hex << ItemQualityColors[temp->Quality];
+    
+    oss << std::dec <<
         "|Hitem:" << entry << ":0:0:0:0:0:0:0:0:0|h[" << name << "]|h|r";
 
     return oss.str();
