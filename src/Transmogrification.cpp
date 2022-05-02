@@ -477,10 +477,14 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
             return false;
     } 
     
-    if (!(AllowMixedWieldingTypes) && ((Is1H(source) && !(Is1H(target))) || (Is2H(source) && !Is2H(target))))
+    if (!(AllowMixedWieldingTypes)
+    && ((Is1H(source) && !Is1H(target))
+    ||  (Is2H(source) && !Is2H(target))))
         return false;
     
-    if (!(AllowMixedWieldingTypes) && ((slot == EQUIPMENT_SLOT_MAINHAND && !IsHandledRight(source)) || (slot == EQUIPMENT_SLOT_OFFHAND && !IsHandledLeft(source))))
+    if (!(AllowMixedWieldingTypes)
+    &&  ((slot == EQUIPMENT_SLOT_MAINHAND && !IsHandledRight(source))
+    ||   (slot == EQUIPMENT_SLOT_OFFHAND  && !IsHandledLeft(source))))
         return false;
 
     return true;
@@ -790,32 +794,40 @@ bool Transmogrification::IsEnabled() const
 
 bool Transmogrification::Is2H(ItemTemplate const* item) const
 {
-    if (item->Class == 2 && item->InventoryType == 17)
-        return true;// ^--Weapon                // ^^-Two-handed
+    if (item->InventoryType == INVTYPE_2HWEAPON)
+        return true;
 
     return false;
 }
 
 bool Transmogrification::Is1H(ItemTemplate const* item) const
 {
-    if (item->Class == 2 && (item->InventoryType == 13 || item->InventoryType == 21 || item->InventoryType == 22))
-        return true;// ^--Weapon                 // ^^-One-handed             // ^^-Main-handed            // ^^-Off-handed weapon
+    if (item->InventoryType == INVTYPE_WEAPON
+    ||  item->InventoryType == INVTYPE_WEAPONMAINHAND
+    ||  item->InventoryType == INVTYPE_WEAPONOFFHAND)
+        return true;
 
     return false;
 }
 
 bool Transmogrification::IsHandledLeft(ItemTemplate const* item) const
 {
-    if (item->InventoryType == 13 || item->InventoryType == 22 || item->InventoryType == 17 || item->InventoryType == 23 || item->InventoryType == 14)
-        return true;      // ^^-One-handed             // ^^-Off-handed weapon      // ^^-Two-handed weapon      // ^^-Off-handed item        // ^^-Shield
+    if (item->InventoryType == INVTYPE_WEAPON
+    ||  item->InventoryType == INVTYPE_WEAPONOFFHAND
+    ||  item->InventoryType == INVTYPE_2HWEAPON
+    ||  item->InventoryType == INVTYPE_HOLDABLE
+    ||  item->InventoryType == INVTYPE_SHIELD)
+        return true;
 
     return false;
 }
 
 bool Transmogrification::IsHandledRight(ItemTemplate const* item) const
 {
-    if (item->InventoryType == 13 || item->InventoryType == 21 || item->InventoryType == 17)
-        return true;     // ^^-One-handed             // ^^-Main-handed            // ^^-Two-handed weapon
+    if (item->InventoryType == INVTYPE_WEAPON
+    ||  item->InventoryType == INVTYPE_WEAPONMAINHAND
+    ||  item->InventoryType == INVTYPE_2HWEAPON)
+        return true;
 
     return false;
 }
