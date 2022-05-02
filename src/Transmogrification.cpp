@@ -18,7 +18,7 @@ void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified
         return;
     if (slot >= EQUIPMENT_SLOT_END)
         return;
-    if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), sObjectMgr->GetItemTemplate(fakeEntry)))
+    if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), sObjectMgr->GetItemTemplate(fakeEntry), slot))
         return;
 
     // [AZTH] Custom
@@ -357,7 +357,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
     }
     else
     {
-        if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), itemTransmogrifier->GetTemplate()))
+        if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), itemTransmogrifier->GetTemplate(), slot))
         {
             //TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) failed CanTransmogrifyItemWithItem ({} with {}).", player->GetGUIDLow(), player->GetName(), itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
             return LANG_ERR_TRANSMOG_INVALID_ITEMS;
@@ -411,7 +411,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
     return LANG_ERR_TRANSMOG_OK;
 }
 
-bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* target, ItemTemplate const* source) const
+bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* target, ItemTemplate const* source, uint8 slot) const
 {
 
     if (!target || !source)
@@ -478,6 +478,9 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
     } 
     
     if (!(AllowMixedWieldingTypes) && ((Is1H(source) && !(Is1H(target))) || (Is2H(source) && !Is2H(target))))
+        return false;
+    
+    if (!(AllowMixedWieldingTypes) && ((slot == EQUIPMENT_SLOT_MAINHAND && !IsHandledRight(source)) || (slot == EQUIPMENT_SLOT_OFFHAND && !IsHandledLeft(source))))
         return false;
 
     return true;
@@ -797,6 +800,22 @@ bool Transmogrification::Is1H(ItemTemplate const* item) const
 {
     if (item->Class == 2 && (item->InventoryType == 13 || item->InventoryType == 21 || item->InventoryType == 22))
         return true;// ^--Weapon                 // ^^-One-handed             // ^^-Main-handed            // ^^-Off-handed weapon
+
+    return false;
+}
+
+bool Transmogrification::IsHandledLeft(ItemTemplate const* item) const
+{
+    if (item->InventoryType == 13 || item->InventoryType == 22 || item->InventoryType == 17 || item->InventoryType == 23 || item->InventoryType == 14)
+        return true;      // ^^-One-handed             // ^^-Off-handed weapon      // ^^-Two-handed weapon      // ^^-Off-handed item        // ^^-Shield
+
+    return false;
+}
+
+bool Transmogrification::IsHandledRight(ItemTemplate const* item) const
+{
+    if (item->InventoryType == 13 || item->InventoryType == 21 || item->InventoryType == 17)
+        return true;     // ^^-One-handed             // ^^-Main-handed            // ^^-Two-handed weapon
 
     return false;
 }
