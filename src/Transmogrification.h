@@ -136,6 +136,8 @@ public:
     bool IsRangedWeapon(uint32 Class, uint32 SubClass) const;
     bool Is2H(ItemTemplate const* item) const;
     bool Is1H(ItemTemplate const* item) const;
+    bool IsHandledLeft(ItemTemplate const* item) const;
+    bool IsHandledRight(ItemTemplate const* item) const;
 
     void LoadConfig(bool reload); // thread unsafe
 
@@ -152,7 +154,7 @@ public:
     TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     TransmogAcoreStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
-    bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
+    bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source, uint8 slot) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
     // bool CanTransmogrify(Item const* item);

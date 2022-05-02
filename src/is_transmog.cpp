@@ -338,7 +338,7 @@ public:
                 Item* newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
                 if (!newItem)
                     continue;
-                if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
+                if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate(), slot))
                     continue;
                 if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
                     continue;
@@ -358,7 +358,7 @@ public:
                     Item* newItem = player->GetItemByPos(i, j);
                     if (!newItem)
                         continue;
-                    if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
+                    if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate(), slot))
                         continue;
                     if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
                         continue;
