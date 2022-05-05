@@ -478,13 +478,16 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
     } 
     
     if (!(AllowMixedWieldingTypes)
-    && ((Is1H(source) && !Is1H(target))
-    ||  (Is2H(source) && !Is2H(target))))
+    &&  ((Is1H(source) && !Is1H(target))
+    ||   (Is2H(source) && !Is2H(target))))
         return false;
     
     if (!(AllowMixedWieldingTypes)
     &&  ((slot == EQUIPMENT_SLOT_MAINHAND && !IsHandledRight(source))
     ||   (slot == EQUIPMENT_SLOT_OFFHAND  && !IsHandledLeft(source))))
+        return false;
+        
+    if (!CheckPlayerClassLimitations(player->getClass(), source->Class, source->SubClass))
         return false;
 
     return true;
@@ -836,4 +839,16 @@ bool Transmogrification::IsHandledRight(ItemTemplate const* item) const
         return true;
 
     return false;
+}
+
+bool Transmogrification::CheckPlayerClassLimitations(uint8 playerClass, uint8 itemClass, uint8 itemSubClass) const
+{
+    if ((itemClass == ITEM_CLASS_ARMOR && !SkipClassArmorLimitations)
+    &&  ((itemSubClass == ITEM_SUBCLASS_ARMOR_LEATHER && (playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK))
+    ||   (itemSubClass == ITEM_SUBCLASS_ARMOR_MAIL    && (playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK || playerClass == CLASS_ROGUE || playerClass == CLASS_DRUID))
+    ||   (itemSubClass == ITEM_SUBCLASS_ARMOR_PLATE   && (playerClass != CLASS_WARRIOR && playerClass != CLASS_PALADIN && playerClass != CLASS_DEATH_KNIGHT))
+    ||   (itemSubClass == ITEM_SUBCLASS_ARMOR_SHIELD  && (playerClass != CLASS_WARRIOR && playerClass != CLASS_PALADIN && playerClass != CLASS_SHAMAN))))
+        return false;
+    
+    return true;
 }

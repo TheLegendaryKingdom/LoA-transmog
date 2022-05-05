@@ -141,6 +141,7 @@ public:
     bool Is1H(ItemTemplate const* item) const;
     bool IsHandledLeft(ItemTemplate const* item) const;
     bool IsHandledRight(ItemTemplate const* item) const;
+    bool CheckPlayerClassLimitations(uint8 playerClass, uint8 itemClass, uint8 itemSubClass) const;
 
     void LoadConfig(bool reload); // thread unsafe
 
