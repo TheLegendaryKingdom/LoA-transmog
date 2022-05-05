@@ -777,16 +777,22 @@ bool Transmogrification::GetAllowMixedWieldingTypes() const
 {
     return AllowMixedWieldingTypes;
 };
+bool Transmogrification::GetSkipClassArmorLimitations() const
+{
+    return SkipClassArmorLimitations;
+};
+bool Transmogrification::GetSkipClassWeaponLimitations() const
+{
+    return SkipClassWeaponLimitations;
+};
 bool Transmogrification::GetUseCollectionSystem() const
 {
     return UseCollectionSystem;
 };
-
 bool Transmogrification::GetTrackUnusableItems() const
 {
     return TrackUnusableItems;
 }
-
 bool Transmogrification::IsEnabled() const
 {
     return IsTransmogEnabled;

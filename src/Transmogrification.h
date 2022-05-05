@@ -124,6 +124,9 @@ public:
     bool IgnoreReqLevel;
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
+    
+    bool SkipClassArmorLimitations;
+    bool SkipClassWeaponLimitations;
 
     bool UseCollectionSystem;
     bool TrackUnusableItems;
@@ -171,6 +174,9 @@ public:
     bool GetAllowMixedArmorTypes() const;
     bool GetAllowMixedWeaponTypes() const;
     bool GetAllowMixedWieldingTypes() const;
+    
+    bool GetSkipClassArmorLimitations() const;
+    bool GetSkipClassWeaponLimitations() const;
 
     // Config
     bool GetEnableTransmogInfo() const;
