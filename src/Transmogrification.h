@@ -124,6 +124,9 @@ public:
     bool IgnoreReqLevel;
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
+    
+    bool SkipClassArmorLimitations;
+    bool SkipClassWeaponLimitations;
 
     bool UseCollectionSystem;
     bool TrackUnusableItems;
@@ -138,6 +141,7 @@ public:
     bool Is1H(ItemTemplate const* item) const;
     bool IsHandledLeft(ItemTemplate const* item) const;
     bool IsHandledRight(ItemTemplate const* item) const;
+    bool CheckPlayerClassLimitations(uint8 playerClass, uint8 itemClass, uint8 itemSubClass) const;
 
     void LoadConfig(bool reload); // thread unsafe
 
@@ -171,6 +175,9 @@ public:
     bool GetAllowMixedArmorTypes() const;
     bool GetAllowMixedWeaponTypes() const;
     bool GetAllowMixedWieldingTypes() const;
+    
+    bool GetSkipClassArmorLimitations() const;
+    bool GetSkipClassWeaponLimitations() const;
 
     // Config
     bool GetEnableTransmogInfo() const;

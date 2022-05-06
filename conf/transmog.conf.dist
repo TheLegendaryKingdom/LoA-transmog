@@ -164,6 +164,14 @@ Transmogrification.TokenAmount = 1
 #    Transmogrification.IgnoreReqStats
 #        Description: Ignore stat count > 0 requirement for source items
 #        Default:    0
+#
+#    Transmogrification.SkipClassArmorLimitations
+#        Description: Skip player class limitations for amor types
+#        Default:    0
+#
+#    Transmogrification.SkipClassWeaponLimitations
+#        Description: Skip player class limitations for weapon types
+#        Default:    0
 
 Transmogrification.AllowPoor = 0
 Transmogrification.AllowCommon = 0
@@ -186,6 +194,9 @@ Transmogrification.IgnoreReqSpell = 0
 Transmogrification.IgnoreReqLevel = 0
 Transmogrification.IgnoreReqEvent = 0
 Transmogrification.IgnoreReqStats = 0
+
+Transmogrification.SkipClassArmorLimitations = 0
+Transmogrification.SkipClassWeaponLimitations = 0
 
 #
 #    SET FEATURE

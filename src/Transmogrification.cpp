@@ -478,13 +478,16 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
     } 
     
     if (!(AllowMixedWieldingTypes)
-    && ((Is1H(source) && !Is1H(target))
-    ||  (Is2H(source) && !Is2H(target))))
+    &&  ((Is1H(source) && !Is1H(target))
+    ||   (Is2H(source) && !Is2H(target))))
         return false;
     
     if (!(AllowMixedWieldingTypes)
     &&  ((slot == EQUIPMENT_SLOT_MAINHAND && !IsHandledRight(source))
     ||   (slot == EQUIPMENT_SLOT_OFFHAND  && !IsHandledLeft(source))))
+        return false;
+        
+    if (!CheckPlayerClassLimitations(player->getClass(), source->Class, source->SubClass))
         return false;
 
     return true;
@@ -777,16 +780,22 @@ bool Transmogrification::GetAllowMixedWieldingTypes() const
 {
     return AllowMixedWieldingTypes;
 };
+bool Transmogrification::GetSkipClassArmorLimitations() const
+{
+    return SkipClassArmorLimitations;
+};
+bool Transmogrification::GetSkipClassWeaponLimitations() const
+{
+    return SkipClassWeaponLimitations;
+};
 bool Transmogrification::GetUseCollectionSystem() const
 {
     return UseCollectionSystem;
 };
-
 bool Transmogrification::GetTrackUnusableItems() const
 {
     return TrackUnusableItems;
 }
-
 bool Transmogrification::IsEnabled() const
 {
     return IsTransmogEnabled;
@@ -830,4 +839,34 @@ bool Transmogrification::IsHandledRight(ItemTemplate const* item) const
         return true;
 
     return false;
+}
+
+bool Transmogrification::CheckPlayerClassLimitations(uint8 playerClass, uint8 itemClass, uint8 itemSubClass) const
+{
+    if ((itemClass == ITEM_CLASS_ARMOR && !SkipClassArmorLimitations)
+    &&  ((itemSubClass == ITEM_SUBCLASS_ARMOR_LEATHER && (playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK))
+    ||   (itemSubClass == ITEM_SUBCLASS_ARMOR_MAIL    && (playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK || playerClass == CLASS_ROGUE || playerClass == CLASS_DRUID))
+    ||   (itemSubClass == ITEM_SUBCLASS_ARMOR_PLATE   && (playerClass != CLASS_WARRIOR && playerClass != CLASS_PALADIN && playerClass != CLASS_DEATH_KNIGHT))
+    ||   (itemSubClass == ITEM_SUBCLASS_ARMOR_SHIELD  && (playerClass != CLASS_WARRIOR && playerClass != CLASS_PALADIN && playerClass != CLASS_SHAMAN))))
+        return false;
+    
+    if ((itemClass == ITEM_CLASS_WEAPON && !SkipClassWeaponLimitations)
+    &&  ((itemSubClass == ITEM_SUBCLASS_WEAPON_AXE      && (playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK || playerClass == CLASS_DRUID))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_AXE2     && (playerClass == CLASS_ROGUE || playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK || playerClass == CLASS_DRUID))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_BOW      && (playerClass != CLASS_WARRIOR && playerClass != CLASS_HUNTER && playerClass != CLASS_ROGUE))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_GUN      && (playerClass != CLASS_WARRIOR && playerClass != CLASS_HUNTER && playerClass != CLASS_ROGUE))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_MACE     && (playerClass == CLASS_HUNTER || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_MACE2    && (playerClass == CLASS_HUNTER || playerClass == CLASS_ROGUE || playerClass == CLASS_PRIEST || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_POLEARM  && (playerClass == CLASS_ROGUE || playerClass == CLASS_PRIEST || playerClass == CLASS_SHAMAN || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_SWORD    && (playerClass == CLASS_PRIEST || playerClass == CLASS_SHAMAN || playerClass == CLASS_DRUID))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_SWORD2   && (playerClass != CLASS_WARRIOR && playerClass != CLASS_PALADIN && playerClass != CLASS_HUNTER && playerClass != CLASS_DEATH_KNIGHT))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_STAFF    && (playerClass == CLASS_PALADIN || playerClass == CLASS_ROGUE || playerClass == CLASS_DEATH_KNIGHT))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_FIST     && (playerClass == CLASS_PALADIN || playerClass == CLASS_PRIEST || playerClass == CLASS_DEATH_KNIGHT || playerClass == CLASS_MAGE || playerClass == CLASS_WARLOCK))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_DAGGER   && (playerClass == CLASS_PALADIN || playerClass == CLASS_DEATH_KNIGHT))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_THROWN   && (playerClass != CLASS_WARRIOR && playerClass != CLASS_ROGUE))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_CROSSBOW && (playerClass != CLASS_WARRIOR && playerClass != CLASS_HUNTER && playerClass != CLASS_ROGUE))
+    ||   (itemSubClass == ITEM_SUBCLASS_WEAPON_WAND     && (playerClass != CLASS_PRIEST && playerClass != CLASS_MAGE && playerClass != CLASS_WARLOCK))))
+        return false;
+        
+    return true;
 }
